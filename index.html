@@ -370,22 +370,4 @@
             updateDisplay();
         }
 
-        document.addEventListener('keydown', (e) => {
-            if ((e.key >= 0 && e.key <= 9) || e.key === '.') appendNumber(e.key);
-            if (e.key === '+' || e.key === '-') appendOperator(e.key);
-            if (e.key === '*') appendOperator('*');
-            if (e.key === '/') appendOperator('/');
-            if (e.key === '%') percentage();
-            if (e.key === 'Enter' || e.key === '=') {
-                e.preventDefault();
-                calculate();
-            }
-            if (e.key === 'Backspace') deleteNumber();
-            if (e.key === 'Escape') clearDisplay();
-        });
-
-        window.addEventListener('resize', updateDisplay);
-        updateDisplay();
-    </script>
-</body>
-</html>
+>
