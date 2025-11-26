@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Win11 Calculator Pro (Balanced)</title>
+    <title>Win11 Calculator Mini</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,6 +14,13 @@
             background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
             background-size: 20px 20px;
             overscroll-behavior: none; 
+            /* จัดให้อยู่กลางจอ */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
         }
 
         /* Custom Scrollbar */
@@ -25,11 +32,11 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 15px 50px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 40px -5px rgba(0, 0, 0, 0.15);
         }
 
         .btn-calc {
@@ -38,10 +45,12 @@
             -webkit-tap-highlight-color: transparent;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+            /* ปรับความสูงปุ่มให้เล็กลง */
+            height: 38px; 
         }
         .btn-calc:active {
-            transform: scale(0.95);
+            transform: scale(0.94);
         }
 
         .btn-op-active {
@@ -66,9 +75,9 @@
             position: absolute;
             background: #1e293b;
             color: white;
-            padding: 4px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 10px;
+            font-size: 9px;
             pointer-events: none;
             opacity: 0;
             transform: translateY(10px);
@@ -89,82 +98,80 @@
 
     </style>
 </head>
-<body class="h-dvh w-full flex items-center justify-center p-0 md:p-4 overflow-hidden bg-gray-100">
+<body>
 
-    <div class="glass-panel w-full h-full md:h-[600px] md:w-[800px] md:rounded-3xl flex flex-col md:flex-row overflow-hidden relative shadow-xl">
+    <div class="glass-panel w-[300px] h-auto max-h-[90vh] rounded-xl flex flex-col overflow-hidden relative shadow-2xl">
         
-        <div class="absolute top-4 left-4 z-20 flex items-center space-x-2 bg-white/90 px-3 py-1.5 rounded-full border border-gray-100 shadow-sm backdrop-blur-sm hover:shadow-md transition-shadow">
-            <span class="text-[10px] uppercase text-gray-400 font-bold tracking-wider"><i class="fa-solid fa-sliders mr-1"></i>ทศนิยม</span>
-            <select id="decimal-selector" onchange="updateDecimalSetting()" class="bg-transparent text-xs font-bold text-blue-600 outline-none cursor-pointer border-none focus:ring-0 text-right pr-1">
-                <option value="0">0</option>
-                <option value="1">1</option>
-                <option value="2" selected>2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="auto">Auto</option>
-            </select>
+        <div class="flex justify-between items-center p-2 bg-white/50 border-b border-gray-100/50 z-20">
+            <div class="flex items-center space-x-1 bg-white/80 px-2 py-0.5 rounded-full border border-gray-200 shadow-sm">
+                <span class="text-[9px] uppercase text-gray-400 font-bold tracking-wider"><i class="fa-solid fa-sliders mr-1"></i>ทศนิยม</span>
+                <select id="decimal-selector" onchange="updateDecimalSetting()" class="bg-transparent text-[10px] font-bold text-blue-600 outline-none cursor-pointer border-none focus:ring-0 text-right pr-0 p-0">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="auto">Auto</option>
+                </select>
+            </div>
+             <button onclick="clearHistory()" class="text-[9px] bg-white border border-gray-200 text-red-400 px-2 py-0.5 rounded-full hover:bg-red-50 transition-colors shadow-sm">ล้างประวัติ</button>
         </div>
 
-        <div class="flex flex-col p-4 md:p-8 relative z-10 w-full md:w-[60%] h-[60%] md:h-full order-1 bg-gradient-to-b from-white/60 to-transparent">
+        <div class="flex flex-col p-3 w-full bg-gradient-to-b from-white/80 to-transparent">
             
-            <div class="flex flex-col items-end justify-end mb-4 h-44 md:h-52 pr-1 overflow-hidden relative space-y-0.5">
+            <div class="flex flex-col items-end justify-end mb-2 h-24 pr-1 overflow-hidden relative space-y-0">
                 
-                <div id="line-1" class="text-gray-400 text-base md:text-lg font-light leading-tight transition-all selectable-num opacity-0" 
+                <div id="line-1" class="text-gray-400 text-xs font-light leading-tight transition-all selectable-num opacity-0" 
                      ondblclick="copyContent(this)"></div>
 
-                <div id="line-2" class="text-blue-500 text-base md:text-lg font-bold leading-tight transition-all opacity-0"></div>
+                <div id="line-2" class="text-blue-500 text-xs font-bold leading-tight transition-all opacity-0"></div>
 
-                <div id="line-3" class="text-gray-400 text-base md:text-lg font-light leading-tight transition-all selectable-num opacity-0"
+                <div id="line-3" class="text-gray-400 text-xs font-light leading-tight transition-all selectable-num opacity-0"
                      ondblclick="copyContent(this)"></div>
 
-                <div id="line-4" class="no-scrollbar text-4xl md:text-5xl text-gray-800 font-semibold tracking-tight w-full text-right leading-none transition-all overflow-x-auto whitespace-nowrap pb-2 pt-1 selectable-num"
+                <div id="line-4" class="no-scrollbar text-3xl text-gray-800 font-semibold tracking-tight w-full text-right leading-none transition-all overflow-x-auto whitespace-nowrap pb-1 pt-0.5 selectable-num"
                      ondblclick="copyContent(this)">0</div>
-
             </div>
 
-            <div class="grid grid-cols-4 gap-2 md:gap-3 flex-grow h-full">
-                <button onclick="clearDisplay()" class="btn-calc bg-red-50 text-red-500 rounded-xl font-bold text-lg hover:bg-red-100">AC</button>
-                <button onclick="deleteNumber()" class="btn-calc bg-white shadow-sm text-gray-600 rounded-xl text-lg hover:bg-gray-50"><i class="fa-solid fa-delete-left"></i></button>
-                <button onclick="percentage()" class="btn-calc bg-white shadow-sm text-blue-600 rounded-xl text-lg font-bold hover:bg-gray-50">%</button>
-                <button id="btn-div" onclick="appendOperator('/')" class="btn-calc bg-blue-50 text-blue-600 rounded-xl text-xl hover:bg-blue-100">÷</button>
+            <div class="grid grid-cols-4 gap-1.5 w-full">
+                <button onclick="clearDisplay()" class="btn-calc bg-red-50 text-red-500 rounded-md font-bold text-sm hover:bg-red-100">AC</button>
+                <button onclick="deleteNumber()" class="btn-calc bg-white shadow-sm text-gray-600 rounded-md text-sm hover:bg-gray-50"><i class="fa-solid fa-delete-left"></i></button>
+                <button onclick="percentage()" class="btn-calc bg-white shadow-sm text-blue-600 rounded-md text-sm font-bold hover:bg-gray-50">%</button>
+                <button id="btn-div" onclick="appendOperator('/')" class="btn-calc bg-blue-50 text-blue-600 rounded-md text-base hover:bg-blue-100">÷</button>
 
-                <button onclick="appendNumber('7')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">7</button>
-                <button onclick="appendNumber('8')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">8</button>
-                <button onclick="appendNumber('9')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">9</button>
-                <button id="btn-mul" onclick="appendOperator('*')" class="btn-calc bg-blue-50 text-blue-600 rounded-xl text-xl hover:bg-blue-100">×</button>
+                <button onclick="appendNumber('7')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">7</button>
+                <button onclick="appendNumber('8')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">8</button>
+                <button onclick="appendNumber('9')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">9</button>
+                <button id="btn-mul" onclick="appendOperator('*')" class="btn-calc bg-blue-50 text-blue-600 rounded-md text-base hover:bg-blue-100">×</button>
 
-                <button onclick="appendNumber('4')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">4</button>
-                <button onclick="appendNumber('5')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">5</button>
-                <button onclick="appendNumber('6')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">6</button>
-                <button id="btn-sub" onclick="appendOperator('-')" class="btn-calc bg-blue-50 text-blue-600 rounded-xl text-xl hover:bg-blue-100">-</button>
+                <button onclick="appendNumber('4')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">4</button>
+                <button onclick="appendNumber('5')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">5</button>
+                <button onclick="appendNumber('6')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">6</button>
+                <button id="btn-sub" onclick="appendOperator('-')" class="btn-calc bg-blue-50 text-blue-600 rounded-md text-base hover:bg-blue-100">-</button>
 
-                <button onclick="appendNumber('1')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">1</button>
-                <button onclick="appendNumber('2')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">2</button>
-                <button onclick="appendNumber('3')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">3</button>
-                <button id="btn-add" onclick="appendOperator('+')" class="btn-calc bg-blue-50 text-blue-600 rounded-xl text-xl hover:bg-blue-100">+</button>
+                <button onclick="appendNumber('1')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">1</button>
+                <button onclick="appendNumber('2')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">2</button>
+                <button onclick="appendNumber('3')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">3</button>
+                <button id="btn-add" onclick="appendOperator('+')" class="btn-calc bg-blue-50 text-blue-600 rounded-md text-base hover:bg-blue-100">+</button>
 
-                <button onclick="toggleSign()" class="btn-calc bg-orange-50 shadow-sm text-orange-500 rounded-xl text-xl font-bold hover:bg-orange-100">+/-</button>
-                <button onclick="appendNumber('0')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl hover:bg-gray-50">0</button>
-                <button onclick="appendNumber('.')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-xl text-2xl font-bold hover:bg-gray-50">.</button>
-                <button onclick="calculate()" class="btn-calc bg-blue-50 text-blue-600 rounded-xl shadow-sm text-2xl hover:bg-blue-100">=</button>
+                <button onclick="toggleSign()" class="btn-calc bg-orange-50 shadow-sm text-orange-500 rounded-md text-sm font-bold hover:bg-orange-100">+/-</button>
+                <button onclick="appendNumber('0')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base hover:bg-gray-50">0</button>
+                <button onclick="appendNumber('.')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-md text-base font-bold hover:bg-gray-50">.</button>
+                <button onclick="calculate()" class="btn-calc bg-blue-50 text-blue-600 rounded-md shadow-sm text-base hover:bg-blue-100">=</button>
             </div>
         </div>
 
-        <div class="w-full md:w-[40%] h-[40%] md:h-full bg-gray-50/90 border-t md:border-t-0 md:border-l border-white/50 p-4 md:p-6 flex flex-col order-2 backdrop-blur-xl">
-            <div class="flex justify-between items-center mb-4 sticky top-0 z-10">
-                <h3 class="text-gray-400 font-bold text-[10px] md:text-xs uppercase tracking-widest flex items-center">
-                    <i class="fa-solid fa-clock-rotate-left mr-2"></i> History
+        <div class="w-full h-32 bg-gray-50/80 border-t border-gray-200/50 p-3 flex flex-col overflow-hidden backdrop-blur-sm">
+            <div class="flex justify-between items-center mb-1">
+                 <h3 class="text-gray-400 font-bold text-[9px] uppercase tracking-widest flex items-center">
+                    <i class="fa-solid fa-clock-rotate-left mr-1"></i> History
                 </h3>
-                <div class="text-[10px] text-gray-400 italic mr-auto ml-2 hidden md:block opacity-70">
-                    (Dbl click copy)
-                </div>
-                <button onclick="clearHistory()" class="text-[10px] bg-white border border-gray-200 text-red-400 px-3 py-1 rounded-full hover:bg-red-50 hover:border-red-100 transition-colors shadow-sm">ล้าง</button>
             </div>
             
-            <div id="history-list" class="flex-grow custom-scrollbar overflow-y-auto pr-1 space-y-2 pb-4">
+            <div id="history-list" class="flex-grow custom-scrollbar overflow-y-auto pr-1 space-y-1">
                 <div class="h-full flex flex-col items-center justify-center text-gray-300 opacity-60">
-                    <i class="fa-regular fa-note-sticky text-3xl mb-2"></i>
-                    <span class="text-xs">ว่างเปล่า</span>
+                    <i class="fa-regular fa-note-sticky text-xl mb-1"></i>
+                    <span class="text-[9px]">Empty</span>
                 </div>
             </div>
         </div>
@@ -420,21 +427,21 @@
             }
 
             const historyItem = document.createElement('div');
-            historyItem.className = "history-item bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col items-end relative overflow-hidden mb-2";
+            historyItem.className = "history-item bg-white p-2 rounded-lg border border-gray-100 shadow-sm flex flex-col items-end relative overflow-hidden mb-1";
             
             const displayPrev = formatNumber(prevRaw);
             const displayCurr = formatNumber(currRaw);
             const displayResult = formatNumber(resultRaw);
             
             historyItem.innerHTML = `
-                <div class="text-gray-400 text-xs mb-1 flex items-center gap-1 z-10 flex-wrap justify-end">
-                    <span class="selectable-num hover:text-blue-500" title="Double click to copy" ondblclick="copyContent(this)">${displayPrev}</span> 
-                    <span class="bg-blue-50 text-blue-600 px-1.5 py-0 rounded font-bold text-[10px]">${op}</span> 
-                    <span class="selectable-num hover:text-blue-500" title="Double click to copy" ondblclick="copyContent(this)">${displayCurr}</span>
+                <div class="text-gray-400 text-[10px] mb-0.5 flex items-center gap-1 z-10 flex-wrap justify-end">
+                    <span class="selectable-num hover:text-blue-500" title="Copy" ondblclick="copyContent(this)">${displayPrev}</span> 
+                    <span class="bg-blue-50 text-blue-600 px-1 py-0 rounded font-bold text-[9px]">${op}</span> 
+                    <span class="selectable-num hover:text-blue-500" title="Copy" ondblclick="copyContent(this)">${displayCurr}</span>
                     <span>=</span>
                 </div>
-                <div class="text-gray-800 font-bold text-xl tracking-tight z-10 selectable-num text-right w-full hover:text-blue-600" 
-                     title="Double click to copy Result" 
+                <div class="text-gray-800 font-bold text-sm tracking-tight z-10 selectable-num text-right w-full hover:text-blue-600" 
+                     title="Copy Result" 
                      ondblclick="copyContent(this)">
                     ${displayResult}
                 </div>
@@ -446,15 +453,15 @@
         function clearHistory() {
             historyListElement.innerHTML = `
                 <div class="h-full flex flex-col items-center justify-center text-gray-300 opacity-60 animate-pulse">
-                    <i class="fa-solid fa-check text-2xl mb-1"></i>
-                    <span class="text-[10px]">ล้างแล้ว</span>
+                    <i class="fa-solid fa-check text-lg mb-1"></i>
+                    <span class="text-[9px]">Cleared</span>
                 </div>
             `;
             setTimeout(() => {
                 historyListElement.innerHTML = `
                 <div class="h-full flex flex-col items-center justify-center text-gray-300 opacity-60">
-                    <i class="fa-regular fa-note-sticky text-3xl mb-1"></i>
-                    <span class="text-[10px]">ว่างเปล่า</span>
+                    <i class="fa-regular fa-note-sticky text-xl mb-1"></i>
+                    <span class="text-[9px]">Empty</span>
                 </div>`;
             }, 800);
         }
