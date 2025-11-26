@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Win11 Calculator Pro (Stack View)</title>
+    <title>Win11 Calculator Compact</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,7 @@
         }
 
         /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
         
@@ -29,7 +29,7 @@
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 50px -10px rgba(0, 0, 0, 0.1);
         }
 
         .btn-calc {
@@ -41,7 +41,7 @@
             border: 1px solid rgba(0,0,0,0.02);
         }
         .btn-calc:active {
-            transform: scale(0.92);
+            transform: scale(0.95);
         }
 
         .btn-op-active {
@@ -66,9 +66,9 @@
             position: absolute;
             background: #1e293b;
             color: white;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
             pointer-events: none;
             opacity: 0;
             transform: translateY(10px);
@@ -91,11 +91,11 @@
 </head>
 <body class="h-dvh w-full flex items-center justify-center p-0 md:p-4 overflow-hidden bg-gray-100">
 
-    <div class="glass-panel w-full h-full md:h-[650px] md:w-[950px] md:rounded-3xl flex flex-col md:flex-row overflow-hidden relative shadow-2xl">
+    <div class="glass-panel w-full h-full md:h-[550px] md:w-[800px] md:rounded-2xl flex flex-col md:flex-row overflow-hidden relative shadow-xl">
         
-        <div class="absolute top-4 left-4 z-20 flex items-center space-x-2 bg-white/90 px-3 py-1.5 rounded-full border border-gray-100 shadow-sm backdrop-blur-sm hover:shadow-md transition-shadow">
+        <div class="absolute top-3 left-3 z-20 flex items-center space-x-2 bg-white/90 px-2 py-1 rounded-full border border-gray-100 shadow-sm backdrop-blur-sm hover:shadow-md transition-shadow">
             <span class="text-[10px] uppercase text-gray-400 font-bold tracking-wider"><i class="fa-solid fa-sliders mr-1"></i>ทศนิยม</span>
-            <select id="decimal-selector" onchange="updateDecimalSetting()" class="bg-transparent text-xs font-bold text-blue-600 outline-none cursor-pointer border-none focus:ring-0 text-right pr-1">
+            <select id="decimal-selector" onchange="updateDecimalSetting()" class="bg-transparent text-[10px] font-bold text-blue-600 outline-none cursor-pointer border-none focus:ring-0 text-right pr-1">
                 <option value="0">0</option>
                 <option value="1">1</option>
                 <option value="2" selected>2</option>
@@ -105,65 +105,66 @@
             </select>
         </div>
 
-        <div class="flex flex-col p-4 md:p-8 relative z-10 w-full md:w-[60%] h-[60%] md:h-full order-1 bg-gradient-to-b from-white/60 to-transparent">
+        <div class="flex flex-col p-4 md:p-6 relative z-10 w-full md:w-[60%] h-[60%] md:h-full order-1 bg-gradient-to-b from-white/60 to-transparent">
             
-            <div class="flex flex-col items-end justify-end mb-4 h-48 md:h-56 pr-2 overflow-hidden relative">
+            <div class="flex flex-col items-end justify-end mb-2 h-40 md:h-44 pr-1 overflow-hidden relative">
                 
-                <div id="line-1" class="text-gray-400 text-2xl md:text-3xl font-light h-8 mb-1 transition-all selectable-num opacity-0" 
+                <div id="line-1" class="text-gray-400 text-lg md:text-xl font-light h-6 mb-0.5 transition-all selectable-num opacity-0" 
                      ondblclick="copyContent(this)"></div>
 
-                <div id="line-2" class="text-blue-500 text-xl md:text-2xl font-bold h-7 mb-1 transition-all opacity-0"></div>
+                <div id="line-2" class="text-blue-500 text-lg md:text-xl font-bold h-6 mb-0.5 transition-all opacity-0"></div>
 
-                <div id="line-3" class="text-gray-400 text-2xl md:text-3xl font-light h-8 mb-1 transition-all selectable-num opacity-0"
+                <div id="line-3" class="text-gray-400 text-lg md:text-xl font-light h-6 mb-0.5 transition-all selectable-num opacity-0"
                      ondblclick="copyContent(this)"></div>
 
-                <div id="line-4" class="no-scrollbar text-6xl md:text-7xl text-gray-800 font-semibold tracking-tight w-full text-right leading-none transition-all overflow-x-auto whitespace-nowrap pb-2 selectable-num"
+                <div id="line-4" class="no-scrollbar text-4xl md:text-5xl text-gray-800 font-semibold tracking-tight w-full text-right leading-none transition-all overflow-x-auto whitespace-nowrap pb-1 selectable-num"
                      ondblclick="copyContent(this)">0</div>
 
             </div>
 
-            <div class="grid grid-cols-4 gap-2 md:gap-3 flex-grow h-full">
-                <button onclick="clearDisplay()" class="btn-calc bg-red-50 text-red-500 rounded-2xl font-bold text-xl hover:bg-red-100">AC</button>
-                <button onclick="deleteNumber()" class="btn-calc bg-white shadow-sm text-gray-600 rounded-2xl text-xl hover:bg-gray-50"><i class="fa-solid fa-delete-left"></i></button>
-                <button onclick="percentage()" class="btn-calc bg-white shadow-sm text-blue-600 rounded-2xl text-xl font-bold hover:bg-gray-50">%</button>
-                <button id="btn-div" onclick="appendOperator('/')" class="btn-calc bg-blue-50 text-blue-600 rounded-2xl text-2xl hover:bg-blue-100">÷</button>
+            <div class="grid grid-cols-4 gap-2 flex-grow h-full">
+                <button onclick="clearDisplay()" class="btn-calc bg-red-50 text-red-500 rounded-lg font-bold text-lg hover:bg-red-100">AC</button>
+                <button onclick="deleteNumber()" class="btn-calc bg-white shadow-sm text-gray-600 rounded-lg text-lg hover:bg-gray-50"><i class="fa-solid fa-delete-left"></i></button>
+                <button onclick="percentage()" class="btn-calc bg-white shadow-sm text-blue-600 rounded-lg text-lg font-bold hover:bg-gray-50">%</button>
+                <button id="btn-div" onclick="appendOperator('/')" class="btn-calc bg-blue-50 text-blue-600 rounded-lg text-xl hover:bg-blue-100">÷</button>
 
-                <button onclick="appendNumber('7')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">7</button>
-                <button onclick="appendNumber('8')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">8</button>
-                <button onclick="appendNumber('9')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">9</button>
-                <button id="btn-mul" onclick="appendOperator('*')" class="btn-calc bg-blue-50 text-blue-600 rounded-2xl text-2xl hover:bg-blue-100">×</button>
+                <button onclick="appendNumber('7')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">7</button>
+                <button onclick="appendNumber('8')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">8</button>
+                <button onclick="appendNumber('9')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">9</button>
+                <button id="btn-mul" onclick="appendOperator('*')" class="btn-calc bg-blue-50 text-blue-600 rounded-lg text-xl hover:bg-blue-100">×</button>
 
-                <button onclick="appendNumber('4')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">4</button>
-                <button onclick="appendNumber('5')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">5</button>
-                <button onclick="appendNumber('6')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">6</button>
-                <button id="btn-sub" onclick="appendOperator('-')" class="btn-calc bg-blue-50 text-blue-600 rounded-2xl text-2xl hover:bg-blue-100">-</button>
+                <button onclick="appendNumber('4')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">4</button>
+                <button onclick="appendNumber('5')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">5</button>
+                <button onclick="appendNumber('6')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">6</button>
+                <button id="btn-sub" onclick="appendOperator('-')" class="btn-calc bg-blue-50 text-blue-600 rounded-lg text-xl hover:bg-blue-100">-</button>
 
-                <button onclick="appendNumber('1')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">1</button>
-                <button onclick="appendNumber('2')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">2</button>
-                <button onclick="appendNumber('3')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">3</button>
-                <button id="btn-add" onclick="appendOperator('+')" class="btn-calc bg-blue-50 text-blue-600 rounded-2xl text-2xl hover:bg-blue-100">+</button>
+                <button onclick="appendNumber('1')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">1</button>
+                <button onclick="appendNumber('2')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">2</button>
+                <button onclick="appendNumber('3')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">3</button>
+                <button id="btn-add" onclick="appendOperator('+')" class="btn-calc bg-blue-50 text-blue-600 rounded-lg text-xl hover:bg-blue-100">+</button>
 
-                <button onclick="appendNumber('0')" class="btn-calc col-span-2 bg-white shadow-sm text-gray-700 rounded-2xl text-3xl hover:bg-gray-50">0</button>
-                <button onclick="appendNumber('.')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-2xl text-3xl font-bold hover:bg-gray-50">.</button>
-                <button onclick="calculate()" class="btn-calc bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-300/50 text-3xl hover:bg-blue-700">=</button>
+                <button onclick="appendNumber('0')" class="btn-calc col-span-2 bg-white shadow-sm text-gray-700 rounded-lg text-xl hover:bg-gray-50">0</button>
+                <button onclick="appendNumber('.')" class="btn-calc bg-white shadow-sm text-gray-700 rounded-lg text-xl font-bold hover:bg-gray-50">.</button>
+                
+                <button onclick="calculate()" class="btn-calc bg-blue-50 text-blue-600 rounded-lg shadow-sm text-xl hover:bg-blue-100">=</button>
             </div>
         </div>
 
-        <div class="w-full md:w-[40%] h-[40%] md:h-full bg-gray-50/90 border-t md:border-t-0 md:border-l border-white/50 p-4 md:p-6 flex flex-col order-2 backdrop-blur-xl">
-            <div class="flex justify-between items-center mb-4 sticky top-0 z-10">
+        <div class="w-full md:w-[40%] h-[40%] md:h-full bg-gray-50/90 border-t md:border-t-0 md:border-l border-white/50 p-4 md:p-5 flex flex-col order-2 backdrop-blur-xl">
+            <div class="flex justify-between items-center mb-2 sticky top-0 z-10">
                 <h3 class="text-gray-400 font-bold text-[10px] md:text-xs uppercase tracking-widest flex items-center">
                     <i class="fa-solid fa-clock-rotate-left mr-2"></i> History
                 </h3>
-                <div class="text-[10px] text-gray-400 italic mr-auto ml-2 hidden md:block opacity-70">
-                    (Double click to copy)
+                <div class="text-[9px] text-gray-400 italic mr-auto ml-2 hidden md:block opacity-70">
+                    (Dbl click copy)
                 </div>
-                <button onclick="clearHistory()" class="text-[10px] bg-white border border-gray-200 text-red-400 px-3 py-1 rounded-full hover:bg-red-50 hover:border-red-100 transition-colors shadow-sm">ล้างประวัติ</button>
+                <button onclick="clearHistory()" class="text-[10px] bg-white border border-gray-200 text-red-400 px-2 py-0.5 rounded-full hover:bg-red-50 hover:border-red-100 transition-colors shadow-sm">ล้าง</button>
             </div>
             
-            <div id="history-list" class="flex-grow custom-scrollbar overflow-y-auto pr-1 space-y-2 pb-4">
+            <div id="history-list" class="flex-grow custom-scrollbar overflow-y-auto pr-1 space-y-1.5 pb-2">
                 <div class="h-full flex flex-col items-center justify-center text-gray-300 opacity-60">
-                    <i class="fa-regular fa-note-sticky text-3xl mb-2"></i>
-                    <span class="text-xs">ว่างเปล่า</span>
+                    <i class="fa-regular fa-note-sticky text-2xl mb-1"></i>
+                    <span class="text-[10px]">ว่างเปล่า</span>
                 </div>
             </div>
         </div>
@@ -177,9 +178,8 @@
         let operation = undefined;
         let shouldResetScreen = false;
         let decimalPlaces = '2';
-        let lastCalculation = null; // เก็บค่าสถานะหลังกด = เพื่อโชว์ 4 บรรทัด
+        let lastCalculation = null;
 
-        // Elements for 4-Line Display
         const line1 = document.getElementById('line-1');
         const line2 = document.getElementById('line-2');
         const line3 = document.getElementById('line-3');
@@ -191,14 +191,11 @@
 
         function updateDecimalSetting() {
             decimalPlaces = decimalSelector.value;
-            // ถ้าพึ่งคำนวณเสร็จ ให้รีเฟรชค่าผลลัพธ์
             if (shouldResetScreen && lastCalculation) {
-                // Re-render result with new decimal
                 const val = parseFloat(currentOperand);
                  if (!isNaN(val)) {
                     const formatted = (decimalPlaces === 'auto') ? val.toString() : val.toFixed(parseInt(decimalPlaces));
                     line4.innerText = `= ${formatNumber(formatted)}`;
-                    // ไม่ต้องแก้ currentOperand เพราะเราเก็บค่าดิบไว้
                  }
             } else {
                updateDisplay();
@@ -206,9 +203,6 @@
         }
 
         function updateDisplay() {
-            // Logic การแสดงผล 4 บรรทัด
-            
-            // 1. ถ้าพึ่งกด = (Show Full 4 Lines)
             if (lastCalculation) {
                 line1.innerText = formatNumber(lastCalculation.prev);
                 line1.classList.remove('opacity-0');
@@ -219,17 +213,12 @@
                 line3.innerText = formatNumber(lastCalculation.curr);
                 line3.classList.remove('opacity-0');
                 
-                // ผลลัพธ์
                 line4.innerText = `= ${formatNumber(currentOperand)}`;
                 
-                // Auto Scroll line 4
                 setTimeout(() => line4.scrollLeft = line4.scrollWidth, 0);
                 return;
             }
 
-            // 2. ถ้าอยู่ระหว่างการพิมพ์ (Normal State)
-            
-            // Line 1 & 2: Show if previous operand exists
             if (previousOperand !== '') {
                 line1.innerText = formatNumber(previousOperand);
                 line1.classList.remove('opacity-0');
@@ -248,11 +237,9 @@
                 line2.classList.add('opacity-0');
             }
 
-            // Line 3: ซ่อนไว้ตอนกำลังพิมพ์ปกติ (จะโชว์แค่ตอนจบ)
             line3.innerText = '';
             line3.classList.add('opacity-0');
 
-            // Line 4: Current Input
             line4.innerText = formatNumber(currentOperand);
             setTimeout(() => line4.scrollLeft = line4.scrollWidth, 0);
         }
@@ -282,13 +269,8 @@
             if (shouldResetScreen) {
                 currentOperand = ''; 
                 shouldResetScreen = false;
-                lastCalculation = null; // Clear 4-line state
+                lastCalculation = null;
                 resetOperatorButtons();
-                
-                // ถ้าเริ่มพิมพ์ใหม่หลังจากกด = ให้เคลียร์บรรทัดบนด้วย
-                if (previousOperand === '' && operation === undefined) {
-                     // Clean slate handled by updateDisplay logic
-                }
             }
 
             if (currentOperand === '0' && number !== '.') {
@@ -302,7 +284,7 @@
         }
 
         function appendOperator(op) {
-            lastCalculation = null; // Clear "Result View"
+            lastCalculation = null;
             
             if (currentOperand === '' && previousOperand !== '') {
                 operation = op;
@@ -312,7 +294,7 @@
             }
 
             if (previousOperand !== '') {
-                calculate(true); // Intermediate calculation
+                calculate(true);
             }
             
             operation = op;
@@ -375,7 +357,6 @@
                 formattedResult = computation.toFixed(parseInt(decimalPlaces));
             }
 
-            // Save state for 4-line display
             if (!isIntermediate) {
                 lastCalculation = {
                     prev: previousOperand,
@@ -392,7 +373,7 @@
                 operation = undefined;
                 previousOperand = '';
             } else {
-                previousOperand = currentOperand; // For chaining
+                previousOperand = currentOperand; 
             }
 
             shouldResetScreen = true;
@@ -400,9 +381,7 @@
             updateDisplay();
         }
 
-        // Generic Copy Function
         function copyContent(element) {
-            // ดึงข้อความ ลบเครื่องหมาย = ออกถ้ามี
             let text = element.innerText.replace('= ', '').replace(/,/g, ''); 
             if(!text) return;
 
@@ -411,8 +390,8 @@
                 setTimeout(() => element.classList.remove('animate-copy'), 300);
 
                 const rect = element.getBoundingClientRect();
-                tooltip.style.left = `${rect.left + (rect.width / 2) - 30}px`;
-                tooltip.style.top = `${rect.top - 35}px`;
+                tooltip.style.left = `${rect.left + (rect.width / 2) - 20}px`;
+                tooltip.style.top = `${rect.top - 25}px`;
                 tooltip.classList.add('show');
                 setTimeout(() => tooltip.classList.remove('show'), 1000);
             });
@@ -424,20 +403,20 @@
             }
 
             const historyItem = document.createElement('div');
-            historyItem.className = "history-item bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex flex-col items-end relative overflow-hidden mb-2";
+            historyItem.className = "history-item bg-white p-2 rounded-lg border border-gray-100 shadow-sm flex flex-col items-end relative overflow-hidden mb-1.5";
             
             const displayPrev = formatNumber(prevRaw);
             const displayCurr = formatNumber(currRaw);
             const displayResult = formatNumber(resultRaw);
             
             historyItem.innerHTML = `
-                <div class="text-gray-400 text-sm md:text-base mb-1 flex items-center gap-1 z-10 flex-wrap justify-end">
+                <div class="text-gray-400 text-xs mb-0.5 flex items-center gap-1 z-10 flex-wrap justify-end">
                     <span class="selectable-num hover:text-blue-500" title="Double click to copy" ondblclick="copyContent(this)">${displayPrev}</span> 
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold text-xs">${op}</span> 
+                    <span class="bg-blue-50 text-blue-600 px-1.5 py-0 rounded font-bold text-[10px]">${op}</span> 
                     <span class="selectable-num hover:text-blue-500" title="Double click to copy" ondblclick="copyContent(this)">${displayCurr}</span>
                     <span>=</span>
                 </div>
-                <div class="text-gray-800 font-bold text-xl md:text-2xl tracking-tight z-10 selectable-num text-right w-full hover:text-blue-600" 
+                <div class="text-gray-800 font-bold text-lg tracking-tight z-10 selectable-num text-right w-full hover:text-blue-600" 
                      title="Double click to copy Result" 
                      ondblclick="copyContent(this)">
                     ${displayResult}
@@ -450,21 +429,21 @@
         function clearHistory() {
             historyListElement.innerHTML = `
                 <div class="h-full flex flex-col items-center justify-center text-gray-300 opacity-60 animate-pulse">
-                    <i class="fa-solid fa-check text-2xl mb-2"></i>
-                    <span class="text-xs">ล้างแล้ว</span>
+                    <i class="fa-solid fa-check text-xl mb-1"></i>
+                    <span class="text-[10px]">ล้างแล้ว</span>
                 </div>
             `;
             setTimeout(() => {
                 historyListElement.innerHTML = `
                 <div class="h-full flex flex-col items-center justify-center text-gray-300 opacity-60">
-                    <i class="fa-regular fa-note-sticky text-3xl mb-2"></i>
-                    <span class="text-xs">ว่างเปล่า</span>
+                    <i class="fa-regular fa-note-sticky text-2xl mb-1"></i>
+                    <span class="text-[10px]">ว่างเปล่า</span>
                 </div>`;
             }, 800);
         }
 
         function deleteNumber() {
-            if (lastCalculation) { // ถ้าอยู่หน้า Result 4 บรรทัด ให้เคลียร์หมดเลย
+            if (lastCalculation) { 
                 clearDisplay();
                 return;
             }
