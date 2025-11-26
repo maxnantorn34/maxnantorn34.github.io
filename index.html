@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Win11 Calculator Pro (Modern Fixed)</title>
+    <title>Win11 Calculator Pro (Stack View)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,9 +25,9 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.8);
             box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.15);
         }
@@ -44,20 +44,6 @@
             transform: scale(0.92);
         }
 
-        /* Operator Badge Style */
-        .op-badge {
-            background-color: #eff6ff;
-            color: #2563eb;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.8em;
-            margin: 0 4px;
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        /* Active Operator Button Style */
         .btn-op-active {
             background-color: #2563eb !important;
             color: white !important;
@@ -92,15 +78,15 @@
         }
         .tooltip-copy.show { opacity: 1; transform: translateY(0); }
 
-        .history-num {
-            transition: all 0.2s;
-            padding: 2px 6px;
-            border-radius: 6px;
+        .selectable-num {
             cursor: pointer;
-            user-select: none;
+            border-radius: 4px;
+            padding: 0 4px;
+            transition: background 0.2s;
         }
-        .history-num:hover { background-color: #f1f5f9; }
-        .history-num:active { background-color: #e2e8f0; }
+        .selectable-num:hover { background-color: rgba(0,0,0,0.05); }
+        .selectable-num:active { background-color: rgba(0,0,0,0.1); }
+
     </style>
 </head>
 <body class="h-dvh w-full flex items-center justify-center p-0 md:p-4 overflow-hidden bg-gray-100">
@@ -121,10 +107,19 @@
 
         <div class="flex flex-col p-4 md:p-8 relative z-10 w-full md:w-[60%] h-[60%] md:h-full order-1 bg-gradient-to-b from-white/60 to-transparent">
             
-            <div class="flex flex-col items-end justify-end mb-4 h-36 md:h-44 pr-2 overflow-hidden">
-                <div id="prev-operand" class="text-gray-400 text-2xl md:text-3xl h-10 transition-all flex items-center justify-end font-light tracking-wide opacity-100 w-full mb-1"></div>
+            <div class="flex flex-col items-end justify-end mb-4 h-48 md:h-56 pr-2 overflow-hidden relative">
                 
-                <div id="current-operand" class="no-scrollbar text-7xl md:text-8xl text-gray-800 font-medium tracking-tight w-full text-right leading-none transition-all overflow-x-auto whitespace-nowrap pb-2">0</div>
+                <div id="line-1" class="text-gray-400 text-2xl md:text-3xl font-light h-8 mb-1 transition-all selectable-num opacity-0" 
+                     ondblclick="copyContent(this)"></div>
+
+                <div id="line-2" class="text-blue-500 text-xl md:text-2xl font-bold h-7 mb-1 transition-all opacity-0"></div>
+
+                <div id="line-3" class="text-gray-400 text-2xl md:text-3xl font-light h-8 mb-1 transition-all selectable-num opacity-0"
+                     ondblclick="copyContent(this)"></div>
+
+                <div id="line-4" class="no-scrollbar text-6xl md:text-7xl text-gray-800 font-semibold tracking-tight w-full text-right leading-none transition-all overflow-x-auto whitespace-nowrap pb-2 selectable-num"
+                     ondblclick="copyContent(this)">0</div>
+
             </div>
 
             <div class="grid grid-cols-4 gap-2 md:gap-3 flex-grow h-full">
@@ -182,47 +177,84 @@
         let operation = undefined;
         let shouldResetScreen = false;
         let decimalPlaces = '2';
+        let lastCalculation = null; // เก็บค่าสถานะหลังกด = เพื่อโชว์ 4 บรรทัด
 
-        const currentOperandTextElement = document.getElementById('current-operand');
-        const previousOperandTextElement = document.getElementById('prev-operand');
+        // Elements for 4-Line Display
+        const line1 = document.getElementById('line-1');
+        const line2 = document.getElementById('line-2');
+        const line3 = document.getElementById('line-3');
+        const line4 = document.getElementById('line-4');
+        
         const historyListElement = document.getElementById('history-list');
         const decimalSelector = document.getElementById('decimal-selector');
         const tooltip = document.getElementById('copy-tooltip');
 
         function updateDecimalSetting() {
             decimalPlaces = decimalSelector.value;
-            if (shouldResetScreen && currentOperand !== 'Error') {
+            // ถ้าพึ่งคำนวณเสร็จ ให้รีเฟรชค่าผลลัพธ์
+            if (shouldResetScreen && lastCalculation) {
+                // Re-render result with new decimal
                 const val = parseFloat(currentOperand);
-                if (!isNaN(val)) {
-                    if (decimalPlaces === 'auto') {
-                        currentOperand = val.toString();
-                    } else {
-                        currentOperand = val.toFixed(parseInt(decimalPlaces));
-                    }
-                    updateDisplay();
-                }
+                 if (!isNaN(val)) {
+                    const formatted = (decimalPlaces === 'auto') ? val.toString() : val.toFixed(parseInt(decimalPlaces));
+                    line4.innerText = `= ${formatNumber(formatted)}`;
+                    // ไม่ต้องแก้ currentOperand เพราะเราเก็บค่าดิบไว้
+                 }
+            } else {
+               updateDisplay();
             }
         }
 
-        // Logic สำคัญ: การแสดงผลต้องไม่หด
         function updateDisplay() {
-            currentOperandTextElement.innerText = formatNumber(currentOperand);
+            // Logic การแสดงผล 4 บรรทัด
             
-            // Auto scroll to right
-            setTimeout(() => {
-                currentOperandTextElement.scrollLeft = currentOperandTextElement.scrollWidth;
-            }, 0);
-
-            // บรรทัดบน (Top Line) จะแสดงเฉพาะตอนกำลังพิมพ์เลขตัวที่สอง หรือมีประวัติค้างอยู่
-            // แต่ถ้าเพิ่งกด Operator เสร็จใหม่ๆ เราจะไม่ย้ายเลขขึ้นไปข้างบน ให้ค้างไว้ที่จอใหญ่
-            if (operation != null && !shouldResetScreen) {
-                // กรณีเริ่มพิมพ์ตัวที่ 2 แล้ว ให้แสดง "ตัวหน้า Operator" ที่บรรทัดบน
-                 previousOperandTextElement.innerHTML = `${formatNumber(previousOperand)} <span class="op-badge">${operation}</span>`;
-            } else {
-                // กรณีเพิ่งกด Operator หรือยังไม่มี Operator บรรทัดบนปล่อยโล่งไว้
-                // เพื่อความสะอาดตาและเลข Main ยังอยู่จอใหญ่
-                previousOperandTextElement.innerHTML = '';
+            // 1. ถ้าพึ่งกด = (Show Full 4 Lines)
+            if (lastCalculation) {
+                line1.innerText = formatNumber(lastCalculation.prev);
+                line1.classList.remove('opacity-0');
+                
+                line2.innerText = lastCalculation.op;
+                line2.classList.remove('opacity-0');
+                
+                line3.innerText = formatNumber(lastCalculation.curr);
+                line3.classList.remove('opacity-0');
+                
+                // ผลลัพธ์
+                line4.innerText = `= ${formatNumber(currentOperand)}`;
+                
+                // Auto Scroll line 4
+                setTimeout(() => line4.scrollLeft = line4.scrollWidth, 0);
+                return;
             }
+
+            // 2. ถ้าอยู่ระหว่างการพิมพ์ (Normal State)
+            
+            // Line 1 & 2: Show if previous operand exists
+            if (previousOperand !== '') {
+                line1.innerText = formatNumber(previousOperand);
+                line1.classList.remove('opacity-0');
+                
+                if (operation) {
+                    line2.innerText = operation;
+                    line2.classList.remove('opacity-0');
+                } else {
+                    line2.innerText = '';
+                    line2.classList.add('opacity-0');
+                }
+            } else {
+                line1.innerText = '';
+                line1.classList.add('opacity-0');
+                line2.innerText = '';
+                line2.classList.add('opacity-0');
+            }
+
+            // Line 3: ซ่อนไว้ตอนกำลังพิมพ์ปกติ (จะโชว์แค่ตอนจบ)
+            line3.innerText = '';
+            line3.classList.add('opacity-0');
+
+            // Line 4: Current Input
+            line4.innerText = formatNumber(currentOperand);
+            setTimeout(() => line4.scrollLeft = line4.scrollWidth, 0);
         }
 
         function formatNumber(number) {
@@ -247,18 +279,22 @@
         }
 
         function appendNumber(number) {
-            // เมื่อเริ่มพิมพ์ตัวเลขใหม่หลังจากกด Operator
             if (shouldResetScreen) {
-                currentOperand = ''; // เคลียร์หน้าจอใหญ่ (Visual only)
+                currentOperand = ''; 
                 shouldResetScreen = false;
-                resetOperatorButtons(); // เอาแสงออกจากปุ่ม Operator
+                lastCalculation = null; // Clear 4-line state
+                resetOperatorButtons();
+                
+                // ถ้าเริ่มพิมพ์ใหม่หลังจากกด = ให้เคลียร์บรรทัดบนด้วย
+                if (previousOperand === '' && operation === undefined) {
+                     // Clean slate handled by updateDisplay logic
+                }
             }
 
             if (currentOperand === '0' && number !== '.') {
                 currentOperand = number;
             } else {
                 if (number === '.' && currentOperand.includes('.')) return;
-                // Limit ยาวๆ กันเหนียว แต่มี scroll แล้ว
                 if (currentOperand.toString().length > 30) return;
                 currentOperand = currentOperand.toString() + number.toString();
             }
@@ -266,26 +302,23 @@
         }
 
         function appendOperator(op) {
-            // ถ้ากด Operator ซ้ำ ให้เปลี่ยน Operator และ Highlight ปุ่มใหม่ แต่ไม่คำนวณซ้ำ
+            lastCalculation = null; // Clear "Result View"
+            
             if (currentOperand === '' && previousOperand !== '') {
                 operation = op;
                 highlightOperator(op);
+                updateDisplay();
                 return;
             }
 
-            // ถ้ามีเลขค้างอยู่ ให้คำนวณก่อน (Chain calculation)
             if (previousOperand !== '') {
-                calculate();
+                calculate(true); // Intermediate calculation
             }
             
-            // Set ค่า
             operation = op;
             previousOperand = currentOperand;
-            shouldResetScreen = true; // บอกระบบว่า "พร้อมจะเคลียร์จอ เมื่อกดเลขตัวถัดไป" (ไม่ใช่ตอนนี้)
-
-            // **สำคัญ** ไม่เคลียร์ currentOperand ทิ้ง! ให้โชว์เลขเดิมตัวใหญ่ๆ ไว้
-            // updateDisplay() จะจัดการเอง
-            // แค่ Highlight ปุ่ม
+            shouldResetScreen = true; 
+            
             highlightOperator(op);
             updateDisplay();
         }
@@ -297,15 +330,12 @@
             if (op === '*') btnId = 'btn-mul';
             if (op === '-') btnId = 'btn-sub';
             if (op === '+') btnId = 'btn-add';
-            
-            if (btnId) {
-                document.getElementById(btnId).classList.add('btn-op-active');
-            }
+            if (btnId) document.getElementById(btnId).classList.add('btn-op-active');
         }
 
         function resetOperatorButtons() {
-            const ids = ['btn-div', 'btn-mul', 'btn-sub', 'btn-add'];
-            ids.forEach(id => document.getElementById(id).classList.remove('btn-op-active'));
+            ['btn-div', 'btn-mul', 'btn-sub', 'btn-add'].forEach(id => 
+                document.getElementById(id).classList.remove('btn-op-active'));
         }
 
         function percentage() {
@@ -315,11 +345,12 @@
             
             const result = curr / 100;
             currentOperand = result.toString();
+            lastCalculation = null;
             shouldResetScreen = true; 
             updateDisplay();
         }
 
-        function calculate() {
+        function calculate(isIntermediate = false) {
             let computation;
             const prev = parseFloat(previousOperand);
             const current = parseFloat(currentOperand);
@@ -331,11 +362,7 @@
                 case '-': computation = prev - current; break;
                 case '*': computation = prev * current; break;
                 case '/': 
-                    if(current === 0) { 
-                        alert("หารด้วยศูนย์ไม่ได้");
-                        resetOperatorButtons();
-                        return; 
-                    }
+                    if(current === 0) { alert("หารด้วยศูนย์ไม่ได้"); resetOperatorButtons(); return; }
                     computation = prev / current; 
                     break;
                 default: return;
@@ -348,20 +375,38 @@
                 formattedResult = computation.toFixed(parseInt(decimalPlaces));
             }
 
+            // Save state for 4-line display
+            if (!isIntermediate) {
+                lastCalculation = {
+                    prev: previousOperand,
+                    op: operation,
+                    curr: currentOperand
+                };
+            }
+
             addToHistory(previousOperand, operation, currentOperand, formattedResult);
 
             currentOperand = formattedResult;
-            operation = undefined;
-            previousOperand = '';
-            shouldResetScreen = true;
             
+            if (!isIntermediate) {
+                operation = undefined;
+                previousOperand = '';
+            } else {
+                previousOperand = currentOperand; // For chaining
+            }
+
+            shouldResetScreen = true;
             resetOperatorButtons();
             updateDisplay();
         }
 
-        // Copy Function
-        function copyValue(value, element) {
-            navigator.clipboard.writeText(value).then(() => {
+        // Generic Copy Function
+        function copyContent(element) {
+            // ดึงข้อความ ลบเครื่องหมาย = ออกถ้ามี
+            let text = element.innerText.replace('= ', '').replace(/,/g, ''); 
+            if(!text) return;
+
+            navigator.clipboard.writeText(text).then(() => {
                 element.classList.add('animate-copy');
                 setTimeout(() => element.classList.remove('animate-copy'), 300);
 
@@ -369,10 +414,7 @@
                 tooltip.style.left = `${rect.left + (rect.width / 2) - 30}px`;
                 tooltip.style.top = `${rect.top - 35}px`;
                 tooltip.classList.add('show');
-
-                setTimeout(() => {
-                    tooltip.classList.remove('show');
-                }, 1000);
+                setTimeout(() => tooltip.classList.remove('show'), 1000);
             });
         }
 
@@ -390,14 +432,14 @@
             
             historyItem.innerHTML = `
                 <div class="text-gray-400 text-sm md:text-base mb-1 flex items-center gap-1 z-10 flex-wrap justify-end">
-                    <span class="history-num hover:text-blue-500" title="Double click to copy" ondblclick="copyValue('${prevRaw}', this)">${displayPrev}</span> 
+                    <span class="selectable-num hover:text-blue-500" title="Double click to copy" ondblclick="copyContent(this)">${displayPrev}</span> 
                     <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold text-xs">${op}</span> 
-                    <span class="history-num hover:text-blue-500" title="Double click to copy" ondblclick="copyValue('${currRaw}', this)">${displayCurr}</span>
+                    <span class="selectable-num hover:text-blue-500" title="Double click to copy" ondblclick="copyContent(this)">${displayCurr}</span>
                     <span>=</span>
                 </div>
-                <div class="text-gray-800 font-bold text-xl md:text-2xl tracking-tight z-10 history-num text-right w-full hover:text-blue-600" 
+                <div class="text-gray-800 font-bold text-xl md:text-2xl tracking-tight z-10 selectable-num text-right w-full hover:text-blue-600" 
                      title="Double click to copy Result" 
-                     ondblclick="copyValue('${resultRaw}', this)">
+                     ondblclick="copyContent(this)">
                     ${displayResult}
                 </div>
             `;
@@ -422,6 +464,10 @@
         }
 
         function deleteNumber() {
+            if (lastCalculation) { // ถ้าอยู่หน้า Result 4 บรรทัด ให้เคลียร์หมดเลย
+                clearDisplay();
+                return;
+            }
             if (shouldResetScreen) {
                 clearDisplay();
                 return;
@@ -436,6 +482,7 @@
             previousOperand = '';
             operation = undefined;
             shouldResetScreen = false;
+            lastCalculation = null;
             resetOperatorButtons();
             updateDisplay();
         }
